@@ -1,6 +1,7 @@
 import subprocess
 import pudb
 from threading import Thread
+import time
 
 proc = subprocess.Popen(['/usr/local/bin/gnuchessx', '--post'],
                         stdin=subprocess.PIPE,
@@ -11,17 +12,17 @@ cpu_moves = []
 usr_moves = []
 
 
-def func1():
+def print_gnu_thinking():
     while True:
         line = proc.stdout.readline().rstrip()
         # receive output from gnuchess and print to console
         while ("My move is" not in line):
-            print "jeff is cool " + line
+            print "GNU thinking: " + line
             line = proc.stdout.readline().rstrip()
         print line
 
 
-def func2():
+def get_user_move():
     while True:
         # ask usr for move
         inp = raw_input("Whatchur moov?") + "\n"
@@ -34,5 +35,11 @@ def func2():
 
 
 if __name__ == '__main__':
-    Thread(target=func1).start()
-    Thread(target=func2).start()
+    t1 = Thread(target=print_gnu_thinking)
+    t2 = Thread(target=get_user_move)
+    t1.daemon = True
+    t2.daemon = True
+    t1.start()
+    t2.start()
+    while True:
+        time.sleep(1)
